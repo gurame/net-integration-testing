@@ -21,7 +21,7 @@ public class CustomerService : ICustomerService
     {
         var customer = await _customerRepository.GetCustomerAsync(customerId);
 		if (customer is null)
-			return Error.NotFound($"Customer with id {customerId} not found");
+			return Error.NotFound(description: $"Customer with id {customerId} not found");
 		
 		return customer.Adapt<CustomerResponse>();
     }
@@ -40,7 +40,7 @@ public class CustomerService : ICustomerService
 		customer.CustomerId = Guid.NewGuid();
 		var result = await _customerRepository.CreateCustomerAsync(customer);
 		if (!result)
-			return Error.Failure("Failed to create customer");
+			return Error.Failure(description: "Failed to create customer");
 
 		var createdCustomer = await _customerRepository.GetCustomerAsync(customer.CustomerId);
 		return createdCustomer.Adapt<CustomerResponse>();
@@ -53,7 +53,7 @@ public class CustomerService : ICustomerService
 
         var customer = await _customerRepository.GetCustomerAsync(customerId);
 		if (customer is null)
-			return Error.NotFound($"Customer with id {customerId} not found");
+			return Error.NotFound(description: $"Customer with id {customerId} not found");
 
 		request.Adapt(customer);
 		var result = await _customerRepository.UpdateCustomerAsync(customer);
@@ -67,11 +67,11 @@ public class CustomerService : ICustomerService
     {
         var customer = await _customerRepository.GetCustomerAsync(customerId);
 		if (customer is null)
-			return Error.NotFound($"Customer with id {customerId} not found");
+			return Error.NotFound(description: $"Customer with id {customerId} not found");
 
 		var result = await _customerRepository.DeleteCustomerAsync(customerId);
 		if (!result)
-			return Error.Failure("Failed to delete customer");
+			return Error.Failure(description: "Failed to delete customer");
 
 		return Result.Deleted;
     }
