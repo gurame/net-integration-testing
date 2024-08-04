@@ -1,11 +1,14 @@
 using Customers.Api.Endpoints.Internal;
 using Customers.Api.Infrastructure.Data;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IDbConnectionFactory>(
     x=> new PostgresConnectionFactory(builder.Configuration.GetConnectionString("DefaultConnection")!));
 builder.Services.AddSingleton<DatabaseInitializer>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddEndpoints<Program>();
 builder.Services.AddEndpointsApiExplorer();
