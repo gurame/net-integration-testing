@@ -1,0 +1,35 @@
+@Api_HostAddress = http://localhost:5101
+
+GET {{Api_HostAddress}}/customers
+Accept: application/json
+
+###
+
+POST {{Api_HostAddress}}/customers
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "johndoe@tesla.com",
+  "gitHubUserName": "johndoe",
+  "dateOfBirth": "1980-01-01"
+}
+
+###
+GET {{Api_HostAddress}}/customers/c270bfbf-24d9-427b-bc56-dda27b77498c
+Accept: application/json
+
+###
+PUT {{Api_HostAddress}}/customers/c270bfbf-24d9-427b-bc56-dda27b77498c
+Content-Type: application/json
+
+{
+  "name": "John Doe Jr.",
+  "email": "johndoe@netflix.com",
+  "gitHubUserName": "johndoejr",
+  "dateOfBirth": "1980-01-01"
+}
+
+###
+
+DELETE {{Api_HostAddress}}/customers/7b3821b1-1849-44ca-bdd4-c038ee3808c9
