@@ -6,7 +6,7 @@ using Microsoft.Playwright;
 namespace Customers.WebApp.Tests.Integration.Pages;
 
 [Collection("TestCollection")]
-public class GetCustomerTests
+public class UpdateCustomerTests
 {
 	private readonly SharedTestContext _testContext;
 	private readonly Faker<Customer> _customerFaker = 
@@ -15,56 +15,41 @@ public class GetCustomerTests
 		.RuleFor(x => x.Email, f => f.Person.Email)
 		.RuleFor(x => x.GitHubUsername, SharedTestContext.ValidGitHubUser)
 		.RuleFor(x => x.DateOfBirth, f => DateOnly.FromDateTime(f.Person.DateOfBirth));
-    public GetCustomerTests(SharedTestContext testContext)
+    public UpdateCustomerTests(SharedTestContext testContext)
     {
         _testContext = testContext;
     }
 
 	[Fact]
-	public async Task Get_ReturnsCustomer_WhenCustomerExists()
-    {
+	public async Task Update_UpdatesCustomer_WhenDataIsValid()
+	{
         //Arrange
         var page = await _testContext.Browser.NewPageAsync(new BrowserNewPageOptions()
         {
             BaseURL = SharedTestContext.WebAppUrl
         });
-
         var customer = await CreateCustomer(page);
+		await page.GotoAsync($"update-customer/{customer.CustomerId}");
+		customer.Name = "Another Name";
 
         //Act
-        var linkElement = page.Locator("article>p>a").First;
-        var link = await linkElement.GetAttributeAsync("href");
-        await page.GotoAsync(link!);
+        await page.FillAsync("input[id=fullname]", customer.Name);
+		await page.ClickAsync("button[type=submit]");
 
 		//Assert
+		var linkElement = page.Locator("article>p>a").First;
+		var link = await linkElement.GetAttributeAsync("href");
+		await page.GotoAsync(link!);
+
         (await page.Locator("p[id=fullname-field]").InnerTextAsync()).Should().Be(customer.Name);
         (await page.Locator("p[id=email-field]").InnerTextAsync()).Should().Be(customer.Email);
         (await page.Locator("p[id=github-username-field]").InnerTextAsync()).Should().Be(customer.GitHubUsername);
         (await page.Locator("p[id=dob-field]").InnerTextAsync()).Should().Be(customer.DateOfBirth.ToString("dd/MM/yyyy"));
 
         await page.CloseAsync();
-    }
-
-	[Fact]
-	public async Task Get_ReturnsNoCustomer_WhenCustomerDoesNotExists()
-	{
-		//Arrange
-        var page = await _testContext.Browser.NewPageAsync(new BrowserNewPageOptions()
-        {
-            BaseURL = SharedTestContext.WebAppUrl
-        });
-		var url = $"{SharedTestContext.WebAppUrl}/customer/{Guid.NewGuid()}";
-
-		//Act
-		await page.GotoAsync(url);
-
-		//Assert
-		(await page.Locator("article>p").InnerTextAsync()).Should().Be("No customer found with this id");
-
-		await page.CloseAsync();
 	}
 
-    private async Task<Customer> CreateCustomer(IPage page)
+	private async Task<Customer> CreateCustomer(IPage page)
     {
         var customer = _customerFaker.Generate();
         await page.GotoAsync("add-customer");
@@ -73,6 +58,11 @@ public class GetCustomerTests
         await page.FillAsync("input[id=github-username]", customer.GitHubUsername);
         await page.FillAsync("input[id=dob]", customer.DateOfBirth.ToString("yyyy-MM-dd"));
         await page.ClickAsync("button[type=submit]");
+
+		var element = page.Locator("article>p>a").First;
+		var link = await element!.GetAttributeAsync("href");
+		var idInText = link!.Split("/").Last();
+		customer.CustomerId = Guid.Parse(idInText);
         return customer;
     }
 }
