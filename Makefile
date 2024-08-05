@@ -10,6 +10,9 @@ test-api:
 run-webapp:
 	dotnet run --project ./src/Customers.WebApp/Customers.WebApp.csproj
 
+test-webapp:
+	dotnet test ./tests/Customers.WebApp.Tests.Integration/Customers.WebApp.Tests.Integration.csproj
+
 up:
 	docker-compose up -d
 

@@ -1,8 +1,6 @@
 using Customers.WebApp.Repositories;
 using Customers.WebApp.Services;
 using Customers.WebApp.Database;
-using Customers.WebApp.Repositories;
-using Customers.WebApp.Services;
 using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -17,7 +15,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddSingleton<IDbConnectionFactory>(_ =>
-    new NpgsqlConnectionFactory(config.GetValue<string>("ConnectionStrings:DefaultConnection")));
+    new NpgsqlConnectionFactory(config.GetValue<string>("ConnectionStrings:DefaultConnection")!));
 builder.Services.AddSingleton<DatabaseInitializer>();
 builder.Services.AddSingleton<ICustomerRepository, CustomerRepository>();
 builder.Services.AddSingleton<ICustomerService, CustomerService>();
