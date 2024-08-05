@@ -42,7 +42,7 @@ public class CustomerService : ICustomerService
 
 		var userExists = await _gitHubService.UserExists(request.GitHubUserName);
 		if (!userExists)
-			return Error.Conflict(description: $"GitHub user {request.GitHubUserName} not found");
+			return Error.Validation("GitHubUserName", $"GitHub user {request.GitHubUserName} not found");
 
 		var customer = request.Adapt<Customer>();
 		customer.CustomerId = Guid.NewGuid();
@@ -65,7 +65,7 @@ public class CustomerService : ICustomerService
 
 		var userExists = await _gitHubService.UserExists(request.GitHubUserName);
 		if (!userExists)
-			return Error.Conflict(description: $"GitHub user {request.GitHubUserName} not found");
+			return Error.Validation("GitHubUserName", $"GitHub user {request.GitHubUserName} not found");
 
 		request.Adapt(customer);
 		var result = await _customerRepository.UpdateCustomerAsync(customer);

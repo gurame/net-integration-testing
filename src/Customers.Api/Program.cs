@@ -13,6 +13,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddHttpClient("GitHub", client=> 
 {
     client.BaseAddress = new Uri(builder.Configuration["GitHub:ApiUrl"]!);
+    client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+    client.DefaultRequestHeaders.Add("User-Agent", "HttpClientFactory-Sample");
 });
 
 builder.Services.AddEndpoints<Program>();

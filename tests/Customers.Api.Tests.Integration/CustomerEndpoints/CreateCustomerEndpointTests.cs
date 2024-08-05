@@ -12,7 +12,7 @@ public class CreateCustomerEndpointTests : IClassFixture<CustomerApiFactory>
         new Faker<CustomerRequest>()
             .RuleFor(x => x.Name, f => f.Person.FullName)
             .RuleFor(x => x.Email, f => f.Person.Email)
-            .RuleFor(x => x.GitHubUserName, "gurame")
+            .RuleFor(x => x.GitHubUserName, CustomerApiFactory.GitHubUser)
             .RuleFor(x => x.DateOfBirth, f => f.Person.DateOfBirth.Date);
     public CreateCustomerEndpointTests(CustomerApiFactory factory)
     {
@@ -30,5 +30,7 @@ public class CreateCustomerEndpointTests : IClassFixture<CustomerApiFactory>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var customerResponse = await response.Content.ReadFromJsonAsync<CustomerResponse>();
+        customerResponse.Should().BeEquivalentTo(customerRequest, options => options.ExcludingMissingMembers());
     }
 }

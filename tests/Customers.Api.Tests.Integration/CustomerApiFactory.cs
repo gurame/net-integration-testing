@@ -11,6 +11,7 @@ namespace Customers.Api.Tests.Integration;
 
 public class CustomerApiFactory : WebApplicationFactory<IApiMarker>, IAsyncLifetime
 {
+	public const string GitHubUser = "gurame";
 	private readonly PostgreSqlContainer _dbContainer = 
 		new PostgreSqlBuilder()
 		.WithDatabase("testing")
@@ -41,7 +42,7 @@ public class CustomerApiFactory : WebApplicationFactory<IApiMarker>, IAsyncLifet
 	public async Task InitializeAsync() 
 	{
 		_gitHubApiServer.Start();
-		_gitHubApiServer.SetUpUser("gurame");
+		_gitHubApiServer.SetUpUser(GitHubUser);
 		await _dbContainer.StartAsync();
 	}
 
