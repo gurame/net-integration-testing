@@ -6,7 +6,7 @@ namespace Customers.Api.Tests.Integration;
 
 public class GitHubApiServer : IDisposable
 {
-	private WireMockServer _server;
+	private WireMockServer _server = null!;
 
     public string Url => _server.Url!;
 
@@ -29,5 +29,6 @@ public class GitHubApiServer : IDisposable
     {
         _server.Stop();
 		_server.Dispose();
+		GC.SuppressFinalize(this);
     }
 }

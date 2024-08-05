@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Bogus;
 using Customers.Api.Contracts;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Customers.Api.Tests.Integration.CustomerEndpoints;
 public class CreateCustomerEndpointTests : IClassFixture<CustomerApiFactory>
@@ -32,5 +33,39 @@ public class CreateCustomerEndpointTests : IClassFixture<CustomerApiFactory>
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var customerResponse = await response.Content.ReadFromJsonAsync<CustomerResponse>();
         customerResponse.Should().BeEquivalentTo(customerRequest, options => options.ExcludingMissingMembers());
+    }
+
+    [Fact]
+    public async Task Create_ReturnsBadRequest_WhenEmailIsNotValid()
+    {
+        // Arrange
+        var customerRequest = _customerFaker.Clone()
+            .RuleFor(x => x.Email, f => f.Random.String2(10))
+            .Generate();
+
+        // Act
+        var response = await _client.PostAsJsonAsync($"/customers", customerRequest);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        problemDetails!.Errors["Email"].Should().Contain("'Email' is not a valid email address.");
+    }
+
+    [Fact]
+    public async Task Create_ReturnsBadRequest_WhenGitHubUserDoesNotExists()
+    {
+        // Arrange
+        var customerRequest = _customerFaker.Clone()
+            .RuleFor(x => x.GitHubUserName, f => f.Random.String2(10))
+            .Generate();
+
+        // Act
+        var response = await _client.PostAsJsonAsync($"/customers", customerRequest);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        problemDetails!.Errors["GitHubUserName"].Should().Contain($"GitHub user {customerRequest.GitHubUserName} not found");
     }
 }
