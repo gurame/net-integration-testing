@@ -12,7 +12,7 @@ public class CreateCustomerEndpointTests : IClassFixture<CustomerApiFactory>
         new Faker<CustomerRequest>()
             .RuleFor(x => x.Name, f => f.Person.FullName)
             .RuleFor(x => x.Email, f => f.Person.Email)
-            .RuleFor(x => x.GitHubUserName, f => f.Person.UserName)
+            .RuleFor(x => x.GitHubUserName, "gurame")
             .RuleFor(x => x.DateOfBirth, f => f.Person.DateOfBirth.Date);
     public CreateCustomerEndpointTests(CustomerApiFactory factory)
     {

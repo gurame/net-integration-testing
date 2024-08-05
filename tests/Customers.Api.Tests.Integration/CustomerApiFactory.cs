@@ -17,6 +17,7 @@ public class CustomerApiFactory : WebApplicationFactory<IApiMarker>, IAsyncLifet
 		.WithUsername("postgres")
 		.WithPassword("postgres")
 		.Build();
+	private readonly GitHubApiServer _gitHubApiServer = new ();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -29,16 +30,24 @@ public class CustomerApiFactory : WebApplicationFactory<IApiMarker>, IAsyncLifet
 		{
 			services.RemoveAll(typeof(IDbConnectionFactory));
 			services.AddSingleton<IDbConnectionFactory>(_ => new PostgresConnectionFactory(_dbContainer.GetConnectionString()));
+
+			services.AddHttpClient("GitHub", client=> 
+			{
+				client.BaseAddress = new Uri(_gitHubApiServer.Url);
+			});
 		});
     }
 
 	public async Task InitializeAsync() 
 	{
+		_gitHubApiServer.Start();
+		_gitHubApiServer.SetUpUser("gurame");
 		await _dbContainer.StartAsync();
 	}
 
     public new async Task DisposeAsync()
 	{
 		await _dbContainer.DisposeAsync();
+		_gitHubApiServer.Dispose();	
 	}
 }

@@ -15,6 +15,7 @@ public class CustomerEndpoints : IEndpoint
     {
         services.AddScoped<ICustomerRepository, CustomerRepository>();
 		services.AddScoped<ICustomerService, CustomerService>();
+		services.AddScoped<IGitHubService, GitHubService>();
     }
     public static void DefineEnpoints(IEndpointRouteBuilder app)
     {

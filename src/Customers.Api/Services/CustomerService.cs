@@ -10,11 +10,15 @@ namespace Customers.Api.Services;
 public class CustomerService : ICustomerService
 {
 	private readonly ICustomerRepository _customerRepository;
-	private readonly IValidator<CustomerRequest> _validator;
+    private readonly IGitHubService _gitHubService;
+    private readonly IValidator<CustomerRequest> _validator;
 
-    public CustomerService(ICustomerRepository customerRepository, IValidator<CustomerRequest> validator)
+    public CustomerService(ICustomerRepository customerRepository, 
+		IGitHubService gitHubService,
+		IValidator<CustomerRequest> validator)
     {
         _customerRepository = customerRepository;
+        _gitHubService = gitHubService;
         _validator = validator;
     }
     public async Task<ErrorOr<CustomerResponse>> GetCustomerAsync(Guid customerId)
@@ -36,6 +40,10 @@ public class CustomerService : ICustomerService
 		if (!validationResult.IsValid)
 			return validationResult.ToErrorOr<CustomerResponse>(null!);
 
+		var userExists = await _gitHubService.UserExists(request.GitHubUserName);
+		if (!userExists)
+			return Error.Conflict(description: $"GitHub user {request.GitHubUserName} not found");
+
 		var customer = request.Adapt<Customer>();
 		customer.CustomerId = Guid.NewGuid();
 		var result = await _customerRepository.CreateCustomerAsync(customer);
@@ -47,13 +55,17 @@ public class CustomerService : ICustomerService
     }
     public async Task<ErrorOr<CustomerResponse>> UpdateCustomerAsync(Guid customerId, CustomerRequest request)
     {
+        var customer = await _customerRepository.GetCustomerAsync(customerId);
+		if (customer is null)
+			return Error.NotFound(description: $"Customer with id {customerId} not found");
+
 		var validationResult = await _validator.ValidateAsync(request);
 		if (!validationResult.IsValid)
 			return validationResult.ToErrorOr<CustomerResponse>(null!);
 
-        var customer = await _customerRepository.GetCustomerAsync(customerId);
-		if (customer is null)
-			return Error.NotFound(description: $"Customer with id {customerId} not found");
+		var userExists = await _gitHubService.UserExists(request.GitHubUserName);
+		if (!userExists)
+			return Error.Conflict(description: $"GitHub user {request.GitHubUserName} not found");
 
 		request.Adapt(customer);
 		var result = await _customerRepository.UpdateCustomerAsync(customer);

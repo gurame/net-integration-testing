@@ -10,6 +10,11 @@ builder.Services.AddSingleton<DatabaseInitializer>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
+builder.Services.AddHttpClient("GitHub", client=> 
+{
+    client.BaseAddress = new Uri(builder.Configuration["GitHub:ApiUrl"]!);
+});
+
 builder.Services.AddEndpoints<Program>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
