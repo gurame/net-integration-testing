@@ -49,6 +49,30 @@ public class UpdateCustomerTests
         await page.CloseAsync();
 	}
 
+	[Fact]
+	public async Task Update_ShowsMessageValidation_WhenEmailIsValid()
+	{
+        //Arrange
+        var page = await _testContext.Browser.NewPageAsync(new BrowserNewPageOptions()
+        {
+            BaseURL = SharedTestContext.WebAppUrl
+        });
+        var customer = await CreateCustomer(page);
+		await page.GotoAsync($"update-customer/{customer.CustomerId}");
+		customer.Email = "invalid-email";
+
+        //Act
+        await page.FillAsync("input[id=email]", customer.Email);
+		await page.FocusAsync("input[id=fullname]");
+
+		//Assert
+		var element =  page.Locator("li.validation-message").First;
+		var text = await element.InnerTextAsync();
+		text.Should().Be("Invalid email format");
+
+        await page.CloseAsync();
+	}
+
 	private async Task<Customer> CreateCustomer(IPage page)
     {
         var customer = _customerFaker.Generate();
