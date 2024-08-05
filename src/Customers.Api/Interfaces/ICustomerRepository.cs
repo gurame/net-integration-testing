@@ -4,7 +4,7 @@ namespace Customers.Api.Interfaces;
 
 public interface ICustomerRepository
 {
-	Task<IEnumerable<Customer>> GetCustomersAsync();
+	Task<IEnumerable<Customer>> GetCustomersAsync(string? searchTerm);
 	Task<Customer> GetCustomerAsync(Guid customerId);
 	Task<bool> CreateCustomerAsync(Customer customer);
 	Task<bool> UpdateCustomerAsync(Customer customer);

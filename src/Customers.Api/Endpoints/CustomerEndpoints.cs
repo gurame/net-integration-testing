@@ -4,6 +4,7 @@ using Customers.Api.Extensions;
 using Customers.Api.Infrastructure.Data;
 using Customers.Api.Interfaces;
 using Customers.Api.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Customers.Api.Endpoints;
 
@@ -19,8 +20,8 @@ public class CustomerEndpoints : IEndpoint
     }
     public static void DefineEnpoints(IEndpointRouteBuilder app)
     {
-        app.MapGet(BasePath, async (ICustomerService service) => {
-			var result = await service.GetCustomersAsync();
+        app.MapGet(BasePath, async ([FromQuery(Name = "q")]string? searchTerm, ICustomerService service) => {
+			var result = await service.GetCustomersAsync(searchTerm);
 			return result.ToMinimalApiResult();
 		})
 		.WithTags(Tag);

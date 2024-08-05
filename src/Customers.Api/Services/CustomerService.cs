@@ -29,9 +29,9 @@ public class CustomerService : ICustomerService
 		
 		return customer.Adapt<CustomerResponse>();
     }
-    public async Task<ErrorOr<IEnumerable<CustomerResponse>>> GetCustomersAsync()
+    public async Task<ErrorOr<IEnumerable<CustomerResponse>>> GetCustomersAsync(string? searchTerm)
     {
-        var customers = await _customerRepository.GetCustomersAsync();
+        var customers = await _customerRepository.GetCustomersAsync(searchTerm);
 		return customers.Select(c => c.Adapt<CustomerResponse>()).ToList();
     }
     public async Task<ErrorOr<CustomerResponse>> CreateCustomerAsync(CustomerRequest request)

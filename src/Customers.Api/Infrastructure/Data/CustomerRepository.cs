@@ -10,22 +10,22 @@ public class CustomerRepository : ICustomerRepository
     {
         _dbConnectionFactory = dbConnectionFactory;
     }
-	public async Task<IEnumerable<Customer>> GetCustomersAsync()
+	public async Task<IEnumerable<Customer>> GetCustomersAsync(string? searchTerm)
     {
-        string sql = "SELECT * FROM Customers";
+        string sql = "SELECT * FROM Customers WHERE @SearchTerm Is Null Or (Name LIKE '%' || @SearchTerm || '%' OR Email LIKE '%' || @SearchTerm || '%')";
 		using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-		return await connection.QueryAsync<Customer>(sql);
+		return await connection.QueryAsync<Customer>(sql, new { SearchTerm = searchTerm });
     }
 	public async Task<Customer> GetCustomerAsync(Guid customerId)
     {
         string sql = "SELECT * FROM Customers WHERE CustomerId = @CustomerId";
-		using var connection = await _dbConnectionFactory.CreateConnectionAsync();
-		return (await connection.QueryFirstOrDefaultAsync<Customer>(sql, new { CustomerId = customerId }))!;
+        using var connection = await _dbConnectionFactory.CreateConnectionAsync();
+        return (await connection.QueryFirstOrDefaultAsync<Customer>(sql, new { CustomerId = customerId }))!;
     }
     public async Task<bool> CreateCustomerAsync(Customer customer)
     {
         string sql = @"INSERT INTO Customers (CustomerId, Name, Email, GitHubUserName, DateOfBirth) 
-						VALUES (@CustomerId, @Name, @Email, @GitHubUserName, @DateOfBirth)";
+                        VALUES (@CustomerId, @Name, @Email, @GitHubUserName, @DateOfBirth)";
 		using var connection = await _dbConnectionFactory.CreateConnectionAsync();
 		return await connection.ExecuteAsync(sql, customer) > 0;
     }
