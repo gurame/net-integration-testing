@@ -2,9 +2,9 @@
 
 public class Customer
 {
-	public Guid CustomerId { get; set; }
-	public string Name { get; set; } = default!;
-	public string Email { get; set; } = default!;
-	public string GitHubUserName { get; set; } = default!;
-	public DateTime DateOfBirth { get; set; }
+	public Guid CustomerId { get; init; } = Guid.NewGuid();
+	public string Name { get; init; } = default!;
+	public string Email { get; init; } = default!;
+	public string GitHubUserName { get; init; } = default!;
+	public DateTime DateOfBirth { get; init; }
 }

@@ -27,12 +27,12 @@ public class CreateCustomerEndpointTests : IClassFixture<CustomerApiFactory>
         var customerRequest = _customerFaker.Generate();
 
         // Act
-        var response = await _client.PostAsJsonAsync($"/customers", customerRequest);
+        var createdResponse = await _client.PostAsJsonAsync($"/customers", customerRequest);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var customerResponse = await response.Content.ReadFromJsonAsync<CustomerResponse>();
-        customerResponse.Should().BeEquivalentTo(customerRequest, options => options.ExcludingMissingMembers());
+        createdResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var createdCustomer = await createdResponse.Content.ReadFromJsonAsync<CustomerResponse>();
+        createdCustomer.Should().BeEquivalentTo(customerRequest, options => options.ExcludingMissingMembers());
     }
 
     [Fact]

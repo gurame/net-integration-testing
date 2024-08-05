@@ -6,6 +6,7 @@ Accept: application/json
 ###
 POST {{Api_HostAddress}}/customers
 Content-Type: application/json
+
 {
   "name": "John Doe",
   "email": "johndoe@tesla.com",
@@ -19,7 +20,9 @@ Accept: application/json
 
 ###
 PUT {{Api_HostAddress}}/customers/f13c7cfe-459d-46c2-a2db-c985f0fb5d5f
+
 Content-Type: application/json
+
 {
   "name": "John Doe Jr.",
   "email": "johndoe@netflix.com",
