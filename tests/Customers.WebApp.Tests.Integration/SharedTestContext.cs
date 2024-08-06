@@ -8,13 +8,12 @@ namespace Customers.WebApp.Tests.Integration;
 
 public class SharedTestContext : IAsyncLifetime
 {
-    public const string ValidGitHubUser = "valid-user";
+    public const string ValidGitHubUser = "validuser";
     public const string WebAppUrl = "http://localhost:7779";
     public GitHubApiServer GitHubApiServer { get; } = new();
     
-    private static readonly string DockerComposeFile = Path.Combine(
-        Directory.GetCurrentDirectory(),
-        (TemplateString)"../../../docker-compose.integration.yml");
+    private static readonly string DockerComposeFile = 
+        Path.Combine(Directory.GetCurrentDirectory(), (TemplateString)"../../../docker-compose.integration.yml");
 
     private readonly ICompositeService _dockerCompose = new Builder()
         .UseContainer()
@@ -36,15 +35,14 @@ public class SharedTestContext : IAsyncLifetime
         _playwright = await Playwright.CreateAsync();
         Browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = false,
-            SlowMo = 1000
+            // Headless = true,
+            SlowMo = 100
         });
     }
     public async Task DisposeAsync()
     {
         await Browser.DisposeAsync();
         _playwright.Dispose();
-    
         _dockerCompose.Dispose();
         GitHubApiServer.Dispose();
     }
